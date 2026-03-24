@@ -1,11 +1,432 @@
 <!DOCTYPE html>
-<html lang="en">
-    <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>PakePlus</title>
-    </head>
-    <body>
-        Hello World
-    </body>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>英语听力练习</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+      background-color: #f8f9fa;
+      color: #333;
+    }
+    
+    /* 标题区域：蓝色背景 */
+    .header {
+      background-color: #4a90e2;
+      color: white;
+      padding: 15px 20px;
+      border-radius: 8px;
+      text-align: center;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    
+    .header h1 {
+      margin: 0;
+      font-size: 1.6rem;
+      font-weight: 600;
+    }
+    
+    .question-container {
+      margin-bottom: 30px;
+      background-color: white;
+      border-radius: 12px;
+      padding: 25px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    
+    h2 {
+      margin-top: 0;
+      margin-bottom: 25px;
+      color: #2c3e50;
+      font-size: 1.5rem;
+      font-weight: 600;
+    }
+    
+    .audio-section {
+      margin: 15px 0;
+    }
+    
+    .audio-item {
+      margin-bottom: 20px;
+    }
+    
+    .audio-controls-row {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    
+    .audio-btn {
+      background-color: #28a745;
+      color: white;
+      border: none;
+      padding: 10px 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+      white-space: nowrap;
+      transition: background-color 0.2s ease;
+    }
+    
+    .audio-btn:hover {
+      background-color: #218838;
+    }
+    
+    audio {
+      flex: 1;
+      min-width: 200px;
+    }
+    
+    .toggle-btn {
+      background-color: #ffc107;
+      color: #333;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 8px;
+      cursor: pointer;
+      flex: 1;
+      min-width: 120px;
+      font-size: 12px;
+      transition: background-color 0.2s ease;
+      margin-top: 10px;
+    }
+    
+    .toggle-btn:hover {
+      background-color: #e0a800;
+    }
+    
+    .hidden {
+      display: none;
+    }
+    
+    .options {
+      margin: 15px 0;
+    }
+    
+    .option {
+      margin: 10px 0;
+      padding: 15px;
+      border: 1px solid #dee2e6;
+      border-radius: 8px;
+      background-color: #fff;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .option:hover {
+      background-color: #f8f9fa;
+      border-color: #ced4da;
+    }
+    
+    .option.selected-correct {
+      background-color: #d4edda;
+      border-color: #c3e6cb;
+      color: #155724;
+    }
+    
+    .option.selected-wrong {
+      background-color: #f8d7da;
+      border-color: #f5c6cb;
+      color: #721c24;
+    }
+    
+    .option input[type="radio"] {
+      width: 20px;
+      height: 20px;
+      cursor: pointer;
+    }
+    
+    .feedback {
+      margin-top: 15px;
+      padding: 12px;
+      border-radius: 6px;
+      font-weight: 600;
+      text-align: center;
+      display: none;
+    }
+    
+    .feedback.error {
+      background-color: #f8d7da;
+      color: #721c24;
+      border: 1px solid #f5c6cb;
+      display: block;
+    }
+    
+    .feedback.success {
+      background-color: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+      display: block;
+    }
+    
+    .navigation {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 30px;
+      padding-top: 20px;
+      border-top: 1px solid #dee2e6;
+    }
+    
+    .nav-btn {
+      background-color: #007bff;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: background-color 0.2s ease;
+    }
+    
+    .nav-btn:hover {
+      background-color: #0056b3;
+    }
+    
+    .nav-btn:disabled {
+      background-color: #ccc;
+      cursor: not-allowed;
+    }
+    
+    .counter {
+      font-weight: bold;
+      font-size: 16px;
+      color: #495057;
+    }
+
+    /* 自动播放提示（可选） */
+    .autoplay-warning {
+      background-color: #fff3cd;
+      color: #856404;
+      padding: 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      margin-top: 8px;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <!-- 标题 -->
+  <div class="header">
+    <h1>第一章 公共用语 单句</h1>
+  </div>
+  
+  <div id="questionContent" class="question-container"></div>
+
+  <div class="navigation">
+    <button id="prevBtn" class="nav-btn" disabled>上一题</button>
+    <span class="counter" id="questionCounter"></span>
+    <button id="nextBtn" class="nav-btn">下一题</button>
+  </div>
+
+  <script>
+    const questions = [
+      {
+        id: 1,
+        stemAudio: "audio/00053294.mp3",
+        optionsAudio: "audio/00053294-a.mp3",
+        question: "What is the main topic of the conversation?",
+        choices: [
+          "A. Planning a holiday trip",
+          "B. Booking a hotel room",
+          "C. Discussing flight prices",
+          "D. Looking for a travel guide"
+        ],
+        correctAnswer: "A. Planning a holiday trip"
+      },
+      {
+        id: 2,
+        stemAudio: "audio/00165952.mp3",
+        optionsAudio: "audio/00165952-a.mp3",
+        question: "Where does the conversation most likely take place?",
+        choices: [
+          "A. At a restaurant",
+          "B. In a classroom",
+          "C. At an airport",
+          "D. In a hospital"
+        ],
+        correctAnswer: "C. At an airport"
+      },
+      {
+        id: 3,
+        stemAudio: "audio/00206001.mp3",
+        optionsAudio: "audio/00206001-a.mp3",
+        question: "What will the man probably do next?",
+        choices: [
+          "A. Make a phone call",
+          "B. Go to the bank",
+          "C. Visit his friend",
+          "D. Take a taxi"
+        ],
+        correctAnswer: "D. Take a taxi"
+      }
+    ];
+
+    let currentQuestionIndex = 0;
+    let answered = false;
+
+    function renderQuestion(index) {
+      const question = questions[index];
+      if (!question) return;
+
+      answered = false;
+
+      const stemId = `stem-audio-${question.id}`;
+      const optionsId = `options-audio-${question.id}`;
+
+      let optionsHtml = '';
+      question.choices.forEach(choice => {
+        optionsHtml += `
+          <div class="option" onclick="handleOptionClick('${choice}', '${question.correctAnswer}')">
+            <input type="radio" name="answer" id="choice-${choice.charAt(0)}" value="${choice}">
+            <label for="choice-${choice.charAt(0)}">${choice}</label>
+          </div>
+        `;
+      });
+
+      document.getElementById('questionContent').innerHTML = `
+        <h2>第 ${question.id} 题（共 ${questions.length} 题）</h2>
+        
+        <div class="audio-section">
+          <!-- 题干 -->
+          <div class="audio-item">
+            <div class="audio-controls-row">
+              <button class="audio-btn" onclick="playById('${stemId}')">播放题干</button>
+              <audio id="${stemId}" controls src="${question.stemAudio}" preload="metadata"></audio>
+            </div>
+            <div id="autoplay-warning-stem" class="autoplay-warning">浏览器阻止了自动播放，请手动点击播放。</div>
+          </div>
+          
+          <!-- 选项 -->
+          <div class="audio-item">
+            <div class="audio-controls-row">
+              <button class="audio-btn" onclick="playById('${optionsId}')">播放选项</button>
+              <audio id="${optionsId}" controls src="${question.optionsAudio}" preload="metadata"></audio>
+            </div>
+            <div id="autoplay-warning-options" class="autoplay-warning">浏览器阻止了自动播放，请手动点击播放。</div>
+          </div>
+        </div>
+        
+        <div class="button-row">
+          <button class="toggle-btn" onclick="toggleStem()">显示/隐藏题干</button>
+          <button class="toggle-btn" onclick="toggleOptions()">显示/隐藏选项</button>
+        </div>
+        
+        <div id="stemText" class="hidden">
+          <p><strong>题干：</strong>${question.question}</p>
+        </div>
+        
+        <div id="optionsText" class="options">
+          ${optionsHtml}
+          <div id="feedbackMessage" class="feedback"></div>
+        </div>
+      `;
+
+      // 更新导航
+      document.getElementById('prevBtn').disabled = index === 0;
+      document.getElementById('nextBtn').disabled = index === questions.length - 1;
+      document.getElementById('questionCounter').textContent = `第 ${question.id} 题 / 共 ${questions.length} 题`;
+
+      // ✅ 自动播放逻辑
+      setTimeout(() => {
+        autoPlayAudios(stemId, optionsId);
+      }, 300); // 稍微延迟确保 DOM 已渲染
+    }
+
+    async function autoPlayAudios(stemId, optionsId) {
+      const stemAudio = document.getElementById(stemId);
+      const optionsAudio = document.getElementById(optionsId);
+
+      if (!stemAudio || !optionsAudio) return;
+
+      // 尝试播放题干
+      try {
+        await stemAudio.play();
+        // 题干播放完毕后播放选项
+        stemAudio.onended = () => {
+          optionsAudio.play().catch(e => {
+            document.getElementById('autoplay-warning-options').style.display = 'block';
+          });
+        };
+      } catch (err) {
+        // 自动播放被阻止
+        document.getElementById('autoplay-warning-stem').style.display = 'block';
+      }
+    }
+
+    function playById(id) {
+      const audio = document.getElementById(id);
+      if (audio) {
+        audio.currentTime = 0;
+        audio.play().catch(e => console.warn("播放失败:", e));
+      }
+    }
+
+    function handleOptionClick(selected, correctAnswer) {
+      if (answered) return;
+
+      const feedbackEl = document.getElementById('feedbackMessage');
+      const optionEls = document.querySelectorAll('.option');
+      
+      optionEls.forEach(opt => {
+        const val = opt.querySelector('input').value;
+        if (val === selected) {
+          opt.classList.add(selected === correctAnswer ? 'selected-correct' : 'selected-wrong');
+          opt.querySelector('input').checked = true;
+        }
+      });
+
+      if (selected === correctAnswer) {
+        feedbackEl.textContent = "✅ 回答正确！";
+        feedbackEl.className = "feedback success";
+        answered = true;
+
+        if (currentQuestionIndex < questions.length - 1) {
+          setTimeout(() => {
+            currentQuestionIndex++;
+            renderQuestion(currentQuestionIndex);
+          }, 1000);
+        }
+      } else {
+        feedbackEl.textContent = "❌ 回答错误！";
+        feedbackEl.className = "feedback error";
+      }
+    }
+
+    function toggleStem() {
+      document.getElementById('stemText').classList.toggle('hidden');
+    }
+
+    function toggleOptions() {
+      document.getElementById('optionsText').classList.toggle('hidden');
+    }
+
+    // 导航
+    document.getElementById('prevBtn').addEventListener('click', () => {
+      if (currentQuestionIndex > 0) {
+        currentQuestionIndex--;
+        renderQuestion(currentQuestionIndex);
+      }
+    });
+
+    document.getElementById('nextBtn').addEventListener('click', () => {
+      if (currentQuestionIndex < questions.length - 1) {
+        currentQuestionIndex++;
+        renderQuestion(currentQuestionIndex);
+      }
+    });
+
+    renderQuestion(currentQuestionIndex);
+  </script>
+</body>
 </html>
